@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "current_feature": "project-skeleton",
+  "features": [
+    {
+      "id": "project-skeleton",
+      "title": "Project Skeleton with FastAPI Backend and React Frontend",
+      "status": "done",
+      "acceptance": [
+        "FastAPI backend with health endpoints",
+        "React + TypeScript + Vite frontend",
+        "Window management API (CRUD + hide/show)",
+        "Dashboard UI with window controls",
+        "Dockerfiles for both services",
+        "docker-compose.yml with Keycloak",
+        "CI workflow with backend/frontend tests and Docker builds",
+        "SQLite persistent storage with async SQLAlchemy",
+        "OIDC-ready configuration"
+      ],
+      "implementation": [
+        "backend/app/main.py",
+        "backend/app/api/health.py",
+        "backend/app/api/v1/windows.py",
+        "backend/app/models/window.py",
+        "backend/app/services/window_service.py",
+        "backend/app/core/config.py",
+        "backend/app/core/database.py",
+        "backend/requirements.txt",
+        "backend/Dockerfile",
+        "frontend/src/main.tsx",
+        "frontend/src/App.tsx",
+        "frontend/src/pages/Dashboard.tsx",
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/components/WindowControls.tsx",
+        "frontend/src/api/client.ts",
+        "frontend/src/styles/global.css",
+        "frontend/package.json",
+        "frontend/tsconfig.json",
+        "frontend/vite.config.ts",
+        "frontend/Dockerfile",
+        "frontend/nginx.conf",
+        "compose.yaml",
+        ".github/workflows/ci.yml",
+        "README.md",
+        "portfolio.json",
+        ".env.example"
+      ],
+      "tests": [
+        "backend/app/tests/test_health.py",
+        "backend/app/tests/test_windows.py",
+        "frontend/src/pages/Dashboard.test.tsx"
+      ]
+    },
+    {
+      "id": "auth-oidc",
+      "title": "OIDC Authentication with Keycloak",
+      "status": "planned",
+      "acceptance": [
+        "Keycloak realm configuration imported",
+        "Backend JWT validation middleware",
+        "Frontend PKCE flow with sessionStorage",
+        "Protected routes and API endpoints",
+        "Role-based access (admin/operator/analyst)"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "window-management",
+      "title": "Window Hide/Show Management (Issue #3008)",
+      "status": "planned",
+      "acceptance": [
+        "Window hide/show API endpoints working",
+        "Frontend window controller component",
+        "Persistent window state in SQLite",
+        "State machine: visible <-> hidden"
+      ],
+      "implementation": [
+        "backend/app/api/v1/windows.py",
+        "backend/app/services/window_service.py",
+        "frontend/src/components/WindowControls.tsx",
+        "frontend/src/pages/Dashboard.tsx"
+      ],
+      "tests": [
+        "backend/app/tests/test_windows.py",
+        "frontend/src/pages/Dashboard.test.tsx"
+      ]
+    },
+    {
+      "id": "touch-support",
+      "title": "Touch Input Support for Mobile (Issue #3310)",
+      "status": "planned",
+      "acceptance": [
+        "Soft keyboard triggers for text inputs",
+        "Long-press context menus",
+        "Touch drag handlers for sliders/dividers",
+        "Responsive breakpoints for phone width"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "animation-system",
+      "title": "Animation System (Issue #2967)",
+      "status": "planned",
+      "acceptance": [
+        "Animation core with spring physics",
+        "Preset animations (fade, slide, scale)",
+        "Configurable duration/easing",
+        "Reduced motion media query support"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "grid-component",
+      "title": "Responsive Grid Component (Issue #2967)",
+      "status": "planned",
+      "acceptance": [
+        "Fixed, flexible, and auto columns",
+        "Responsive column counts by viewport",
+        "Row/column spanning",
+        "Virtualization for large datasets"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "media-overlays",
+      "title": "Media Overlays (Issue #2967)",
+      "status": "planned",
+      "acceptance": [
+        "Overlay positioning system (9 positions)",
+        "Hover-triggered content",
+        "Multi-overlay composition",
+        "Text, icon, badge, button overlays"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "file-attachments",
+      "title": "File Attachments (Issue #2967)",
+      "status": "planned",
+      "acceptance": [
+        "Drag and drop zone",
+        "Folder tree preservation",
+        "Thumbnail generation",
+        "Upload progress tracking"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "video-player",
+      "title": "Video Player (Issue #2967)",
+      "status": "planned",
+      "acceptance": [
+        "Play/pause/seek with timeline",
+        "Fullscreen and PiP support",
+        "Keyboard shortcuts",
+        "Custom controls overlay"
+      ],
+      "implementation": [],
+      "tests": []
+    }
+  ]
+}

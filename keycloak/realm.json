@@ -1,0 +1,124 @@
+{
+  "realm": "cobalt",
+  "enabled": true,
+  "displayName": "Cobalt Console",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "clients": [
+    {
+      "clientId": "cobalt-console",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "change-me-in-production",
+      "redirectUris": [
+        "http://localhost/*",
+        "http://127.0.0.1/*"
+      ],
+      "webOrigins": [
+        "http://localhost",
+        "http://127.0.0.1"
+      ],
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "900",
+        "client.secret.creation.time": "0"
+      },
+      "defaultClientScopes": [
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": []
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Full administrative access"
+      },
+      {
+        "name": "operator",
+        "description": "Can manage windows and configurations"
+      },
+      {
+        "name": "analyst",
+        "description": "Read-only access to window state"
+      }
+    ]
+  },
+  "groups": [],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@cobalt.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"],
+      "requiredActions": []
+    },
+    {
+      "username": "operator",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Operator",
+      "lastName": "User",
+      "email": "operator@cobalt.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "operator",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["operator"],
+      "requiredActions": []
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "roles",
+      "description": "User roles",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ]
+}
