@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-project-skeleton
+auth-oidc
 
 ## Roadmap
 
@@ -29,7 +29,7 @@ Tests: `backend/app/tests/test_health.py`, `backend/app/tests/test_windows.py`, 
 
 ### auth-oidc — OIDC Authentication with Keycloak
 
-Status: planned
+Status: done
 
 Acceptance:
 - Keycloak realm configuration imported
@@ -37,6 +37,10 @@ Acceptance:
 - Frontend PKCE flow with sessionStorage
 - Protected routes and API endpoints
 - Role-based access (admin/operator/analyst)
+
+Implementation: `backend/app/core/auth.py`, `backend/app/api/v1/auth.py`, `backend/app/api/v1/windows.py`, `backend/app/main.py`, `backend/app/tests/test_auth.py`, `backend/app/tests/test_windows.py`
+
+Tests: `backend/app/tests/test_health.py`, `backend/app/tests/test_windows.py`, `frontend/src/pages/Dashboard.test.tsx`
 
 ### window-management — Window Hide/Show Management (Issue #3008)
 

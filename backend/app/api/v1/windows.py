@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import get_current_user
 from app.core.database import get_session
 from app.models.window import (
     WindowCreate,
@@ -22,6 +23,7 @@ def get_window_service(session: AsyncSession = Depends(get_session)) -> WindowSe
 async def create_window(
     window_data: WindowCreate,
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> WindowResponse:
     existing = await service.get_window(window_data.window_id)
     if existing:
@@ -37,6 +39,7 @@ async def list_windows(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> WindowListResponse:
     return await service.list_windows(page=page, page_size=page_size)
 
@@ -45,6 +48,7 @@ async def list_windows(
 async def get_window(
     window_id: str,
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> WindowResponse:
     window = await service.get_window(window_id)
     if not window:
@@ -57,6 +61,7 @@ async def update_window(
     window_id: str,
     window_data: WindowUpdate,
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> WindowResponse:
     window = await service.update_window(window_id, window_data)
     if not window:
@@ -68,6 +73,7 @@ async def update_window(
 async def hide_window(
     window_id: str,
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> WindowResponse:
     window = await service.hide_window(window_id)
     if not window:
@@ -79,6 +85,7 @@ async def hide_window(
 async def show_window(
     window_id: str,
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> WindowResponse:
     window = await service.show_window(window_id)
     if not window:
@@ -90,6 +97,7 @@ async def show_window(
 async def delete_window(
     window_id: str,
     service: WindowService = Depends(get_window_service),
+    user: dict = Depends(get_current_user),
 ) -> None:
     deleted = await service.delete_window(window_id)
     if not deleted:
