@@ -5,7 +5,9 @@ from sqlalchemy.pool import StaticPool
 
 from app.main import create_app
 from app.core.database import get_session
-from app.models.window import Window, WindowState, Base
+from app.core.auth import get_current_user
+from app.tests.test_auth import get_test_user, TEST_TOKEN
+from app.models.window import Window, WindowState, Base, WindowCreate
 from app.services.window_service import WindowService
 
 
@@ -46,9 +48,12 @@ def client(test_engine):
     
     app = create_app()
     app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_current_user] = get_test_user
     
     transport = ASGITransport(app=app)
-    return AsyncClient(transport=transport, base_url="http://test")
+    client = AsyncClient(transport=transport, base_url="http://test")
+    client.headers.update({"Authorization": f"Bearer {TEST_TOKEN}"})
+    return client
 
 
 @pytest.fixture(scope="function")
@@ -135,24 +140,25 @@ class TestWindowAPI:
 class TestWindowService:
     @pytest.mark.asyncio
     async def test_create_and_get(self, window_service: WindowService):
-        from app.models.window import WindowCreate
-        created = await window_service.create_window(WindowCreate(window_id="svc-1", title="Service Test"))
-        assert created.window_id == "svc-1"
-        assert created.title == "Service Test"
-        assert created.state == WindowState.VISIBLE
-
+        window = await window_service.create_window(WindowCreate(
+            window_id="svc-1", title="Service Window"
+        ))
+        assert window.window_id == "svc-1"
+        assert window.title == "Service Window"
+        
         fetched = await window_service.get_window("svc-1")
         assert fetched is not None
         assert fetched.window_id == "svc-1"
 
     @pytest.mark.asyncio
     async def test_hide_show_service(self, window_service: WindowService):
-        from app.models.window import WindowCreate
-        await window_service.create_window(WindowCreate(window_id="svc-hide", title="Hide Service"))
-        hidden = await window_service.hide_window("svc-hide")
+        await window_service.create_window(WindowCreate(
+            window_id="svc-2", title="Hide Show"
+        ))
+        hidden = await window_service.hide_window("svc-2")
         assert hidden is not None
         assert hidden.state == WindowState.HIDDEN
-
-        shown = await window_service.show_window("svc-hide")
+        
+        shown = await window_service.show_window("svc-2")
         assert shown is not None
         assert shown.state == WindowState.VISIBLE

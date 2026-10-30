@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "project-skeleton",
+  "current_feature": "auth-oidc",
   "features": [
     {
       "id": "project-skeleton",
@@ -54,7 +54,7 @@
     {
       "id": "auth-oidc",
       "title": "OIDC Authentication with Keycloak",
-      "status": "planned",
+      "status": "done",
       "acceptance": [
         "Keycloak realm configuration imported",
         "Backend JWT validation middleware",
@@ -62,8 +62,8 @@
         "Protected routes and API endpoints",
         "Role-based access (admin/operator/analyst)"
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": ["backend/app/core/auth.py", "backend/app/api/v1/auth.py", "backend/app/api/v1/windows.py", "backend/app/main.py", "backend/app/tests/test_auth.py", "backend/app/tests/test_windows.py"],
+      "tests": ["backend/app/tests/test_health.py", "backend/app/tests/test_windows.py", "frontend/src/pages/Dashboard.test.tsx"]
     },
     {
       "id": "window-management",

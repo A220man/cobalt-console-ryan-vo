@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.0.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
@@ -19,11 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker Compose with backend, frontend, and Keycloak services
 - CI pipeline with backend tests, frontend typecheck/build/test, Docker builds
 - Portfolio.json manifest for portfolio tracking
-- MIT License with author metadata
+- Backend JWT validation middleware with Keycloak JWKS
+- Protected API endpoints with Bearer token authentication
+- Role-based access control (admin, operator, analyst)
+- Auth endpoints: /me, /logout, /admin-only
+- Test authentication override for integration testing
 
 ### Infrastructure
 - SQLite persistent storage with SQLAlchemy async
-- Pytest test suite with 12+ backend tests
+- Pytest test suite with 13 backend tests
 - Vitest frontend tests with React Testing Library
 - Nginx reverse proxy for production frontend serving
 - Health checks for all Docker services
