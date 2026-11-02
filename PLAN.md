@@ -44,13 +44,15 @@ Tests: `backend/app/tests/test_health.py`, `backend/app/tests/test_windows.py`, 
 
 ### window-management — Window Hide/Show Management (Issue #3008)
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - Window hide/show API endpoints working
 - Frontend window controller component
 - Persistent window state in SQLite
 - State machine: visible <-> hidden
+- Minimize/maximize API endpoints
+- Frontend minimize/maximize controls
 
 Implementation: `backend/app/api/v1/windows.py`, `backend/app/services/window_service.py`, `frontend/src/components/WindowControls.tsx`, `frontend/src/pages/Dashboard.tsx`
 

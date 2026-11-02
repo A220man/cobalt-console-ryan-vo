@@ -102,6 +102,20 @@ export const api = {
       (windowId: string) => Promise<WindowState>
     >,
 
+    minimize: ((windowId: string) =>
+      request<WindowState>(`/windows/${encodeURIComponent(windowId)}/minimize`, {
+        method: 'POST',
+      })) as MockableFn<
+      (windowId: string) => Promise<WindowState>
+    >,
+
+    maximize: ((windowId: string) =>
+      request<WindowState>(`/windows/${encodeURIComponent(windowId)}/maximize`, {
+        method: 'POST',
+      })) as MockableFn<
+      (windowId: string) => Promise<WindowState>
+    >,
+
     delete: ((windowId: string) =>
       request<void>(`/windows/${encodeURIComponent(windowId)}`, {
         method: 'DELETE',

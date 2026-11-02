@@ -1,8 +1,21 @@
 # Changelog
 
+## 1.2.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.1.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
+
+### Added
+- Window minimize/maximize API endpoints (`POST /windows/{id}/minimize`, `POST /windows/{id}/maximize`)
+- WindowService minimize/maximize methods
+- Frontend API client minimize/maximize methods
+- WindowControls component with full state machine (visible, minimized, maximized, hidden)
+- State-specific badge styling for all four window states
+- Backend tests for minimize/maximize endpoints and state transitions
+- Service tests for minimize/maximize operations
 
 ## 1.0.0 — work-in-progress checkpoint
 

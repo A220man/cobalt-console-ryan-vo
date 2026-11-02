@@ -93,6 +93,28 @@ async def show_window(
     return window
 
 
+@router.post("/windows/{window_id}/minimize", response_model=WindowResponse)
+async def minimize_window(
+    window_id: str,
+    service: WindowService = Depends(get_window_service),
+) -> WindowResponse:
+    window = await service.minimize_window(window_id)
+    if not window:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Window not found")
+    return window
+
+
+@router.post("/windows/{window_id}/maximize", response_model=WindowResponse)
+async def maximize_window(
+    window_id: str,
+    service: WindowService = Depends(get_window_service),
+) -> WindowResponse:
+    window = await service.maximize_window(window_id)
+    if not window:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Window not found")
+    return window
+
+
 @router.delete("/windows/{window_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_window(
     window_id: str,

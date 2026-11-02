@@ -127,6 +127,51 @@ class TestWindowAPI:
         assert response.status_code == 200
         data = response.json()
         assert data["state"] == "visible"
+    @pytest.mark.asyncio
+    async def test_minimize_window(self, client: AsyncClient):
+        await client.post("/api/v1/windows", json={"window_id": "min-1", "title": "To Minimize"})
+        response = await client.post("/api/v1/windows/min-1/minimize")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["state"] == "minimized"
+
+    @pytest.mark.asyncio
+    async def test_maximize_window(self, client: AsyncClient):
+        await client.post("/api/v1/windows", json={"window_id": "max-1", "title": "To Maximize"})
+        response = await client.post("/api/v1/windows/max-1/maximize")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["state"] == "maximized"
+
+    @pytest.mark.asyncio
+    async def test_state_transitions(self, client: AsyncClient):
+        """Test full state machine: visible -> minimized -> maximized -> visible"""
+        await client.post("/api/v1/windows", json={"window_id": "trans-1", "title": "Transitions"})
+        
+        # visible -> minimized
+        resp = await client.post("/api/v1/windows/trans-1/minimize")
+        assert resp.status_code == 200
+        assert resp.json()["state"] == "minimized"
+        
+        # minimized -> maximized
+        resp = await client.post("/api/v1/windows/trans-1/maximize")
+        assert resp.status_code == 200
+        assert resp.json()["state"] == "maximized"
+        
+        # maximized -> visible (restore)
+        resp = await client.post("/api/v1/windows/trans-1/show")
+        assert resp.status_code == 200
+        assert resp.json()["state"] == "visible"
+        
+        # visible -> hidden
+        resp = await client.post("/api/v1/windows/trans-1/hide")
+        assert resp.status_code == 200
+        assert resp.json()["state"] == "hidden"
+        
+        # hidden -> visible
+        resp = await client.post("/api/v1/windows/trans-1/show")
+        assert resp.status_code == 200
+        assert resp.json()["state"] == "visible"
 
     @pytest.mark.asyncio
     async def test_delete_window(self, client: AsyncClient):
@@ -135,8 +180,6 @@ class TestWindowAPI:
         assert response.status_code == 204
         get_response = await client.get("/api/v1/windows/del-1")
         assert get_response.status_code == 404
-
-
 class TestWindowService:
     @pytest.mark.asyncio
     async def test_create_and_get(self, window_service: WindowService):
@@ -160,5 +203,22 @@ class TestWindowService:
         assert hidden.state == WindowState.HIDDEN
         
         shown = await window_service.show_window("svc-2")
+        assert shown is not None
+        assert shown.state == WindowState.VISIBLE
+
+    @pytest.mark.asyncio
+    async def test_minimize_maximize_service(self, window_service: WindowService):
+        await window_service.create_window(WindowCreate(
+            window_id="svc-3", title="Minimize Maximize"
+        ))
+        minimized = await window_service.minimize_window("svc-3")
+        assert minimized is not None
+        assert minimized.state == WindowState.MINIMIZED
+
+        maximized = await window_service.maximize_window("svc-3")
+        assert maximized is not None
+        assert maximized.state == WindowState.MAXIMIZED
+
+        shown = await window_service.show_window("svc-3")
         assert shown is not None
         assert shown.state == WindowState.VISIBLE
