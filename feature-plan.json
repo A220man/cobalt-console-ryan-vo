@@ -68,12 +68,14 @@
     {
       "id": "window-management",
       "title": "Window Hide/Show Management (Issue #3008)",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "Window hide/show API endpoints working",
         "Frontend window controller component",
         "Persistent window state in SQLite",
-        "State machine: visible <-> hidden"
+        "State machine: visible <-> hidden",
+        "Minimize/maximize API endpoints",
+        "Frontend minimize/maximize controls"
       ],
       "implementation": [
         "backend/app/api/v1/windows.py",

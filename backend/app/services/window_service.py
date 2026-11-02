@@ -57,6 +57,12 @@ class WindowService:
         await self.session.refresh(window)
         return WindowResponse.model_validate(window)
 
+    async def minimize_window(self, window_id: str) -> Optional[WindowResponse]:
+        return await self.update_window(window_id, WindowUpdate(state=WindowState.MINIMIZED))
+
+    async def maximize_window(self, window_id: str) -> Optional[WindowResponse]:
+        return await self.update_window(window_id, WindowUpdate(state=WindowState.MAXIMIZED))
+
     async def hide_window(self, window_id: str) -> Optional[WindowResponse]:
         return await self.update_window(window_id, WindowUpdate(state=WindowState.HIDDEN))
 
