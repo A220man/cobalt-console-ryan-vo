@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "auth-oidc",
+  "current_feature": "window-management",
   "features": [
     {
       "id": "project-skeleton",
@@ -68,7 +68,7 @@
     {
       "id": "window-management",
       "title": "Window Hide/Show Management (Issue #3008)",
-      "status": "in_progress",
+      "status": "done",
       "acceptance": [
         "Window hide/show API endpoints working",
         "Frontend window controller component",
