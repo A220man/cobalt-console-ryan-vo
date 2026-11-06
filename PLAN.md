@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-auth-oidc
+window-management
 
 ## Roadmap
 
@@ -44,7 +44,7 @@ Tests: `backend/app/tests/test_health.py`, `backend/app/tests/test_windows.py`, 
 
 ### window-management — Window Hide/Show Management (Issue #3008)
 
-Status: in_progress
+Status: done
 
 Acceptance:
 - Window hide/show API endpoints working
