@@ -10,20 +10,20 @@ interface WindowControlsProps {
 
 const badgeStyles: Record<'visible' | 'hidden' | 'minimized' | 'maximized', React.CSSProperties> = {
   visible: {
-    backgroundColor: 'rgba(74, 222, 128, 0.2)',
-    color: 'var(--color-success)',
+    backgroundColor: 'var(--color-success)',
+    color: 'white',
   },
   hidden: {
-    backgroundColor: 'rgba(255, 107, 107, 0.2)',
-    color: 'var(--color-error)',
+    backgroundColor: 'var(--color-muted)',
+    color: 'var(--color-text)',
   },
   minimized: {
-    backgroundColor: 'rgba(251, 191, 36, 0.2)',
-    color: 'var(--color-warning)',
+    backgroundColor: 'var(--color-warning)',
+    color: 'var(--color-text)',
   },
   maximized: {
-    backgroundColor: 'rgba(96, 165, 250, 0.2)',
-    color: 'var(--color-info)',
+    backgroundColor: 'var(--color-info)',
+    color: 'white',
   },
 }
 
@@ -88,6 +88,20 @@ export function WindowControls({ windowId, title, initialState, onStateChange }:
     }
   }
 
+  async function restore() {
+    setLoading(true)
+    setError(null)
+    try {
+      const result = await api.windows.restore(windowId)
+      setState(result.state)
+      onStateChange?.(result.state)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to restore window')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function renderActions() {
     switch (state) {
       case 'visible':
@@ -107,7 +121,7 @@ export function WindowControls({ windowId, title, initialState, onStateChange }:
       case 'minimized':
         return (
           <>
-            <button style={styles.buttonPrimary} onClick={show} disabled={loading}>
+            <button style={styles.buttonPrimary} onClick={restore} disabled={loading}>
               {loading ? 'Restoring...' : 'Restore'}
             </button>
             <button style={styles.buttonSecondary} onClick={maximize} disabled={loading}>
@@ -121,7 +135,7 @@ export function WindowControls({ windowId, title, initialState, onStateChange }:
       case 'maximized':
         return (
           <>
-            <button style={styles.buttonPrimary} onClick={show} disabled={loading}>
+            <button style={styles.buttonPrimary} onClick={restore} disabled={loading}>
               {loading ? 'Restoring...' : 'Restore'}
             </button>
             <button style={styles.buttonSecondary} onClick={minimize} disabled={loading}>
@@ -159,54 +173,63 @@ export function WindowControls({ windowId, title, initialState, onStateChange }:
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    backgroundColor: 'var(--color-bg-secondary)',
     border: '1px solid var(--color-border)',
     borderRadius: 'var(--radius-md)',
     padding: 'var(--spacing-md)',
-    maxWidth: '320px',
+    backgroundColor: 'var(--color-surface)',
+    boxShadow: 'var(--shadow-sm)',
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 'var(--spacing-sm)',
+    marginBottom: 'var(--spacing-md)',
   },
   title: {
-    fontSize: '1rem',
+    margin: 0,
+    fontSize: 'var(--font-size-lg)',
     fontWeight: 600,
-    color: 'var(--color-fg)',
+    color: 'var(--color-text)',
   },
   badge: {
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    padding: '2px 8px',
+    padding: 'var(--spacing-xs) var(--spacing-sm)',
     borderRadius: 'var(--radius-sm)',
+    fontSize: 'var(--font-size-xs)',
+    fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
   },
   error: {
     color: 'var(--color-error)',
-    fontSize: '0.875rem',
+    fontSize: 'var(--font-size-sm)',
     marginBottom: 'var(--spacing-sm)',
   },
   actions: {
     display: 'flex',
     gap: 'var(--spacing-sm)',
+    flexWrap: 'wrap',
   },
   buttonPrimary: {
-    backgroundColor: 'var(--color-primary)',
-    color: 'var(--color-bg)',
-    padding: 'var(--spacing-xs) var(--spacing-md)',
+    padding: 'var(--spacing-sm) var(--spacing-md)',
+    border: 'none',
     borderRadius: 'var(--radius-sm)',
+    backgroundColor: 'var(--color-primary)',
+    color: 'white',
+    fontSize: 'var(--font-size-sm)',
     fontWeight: 500,
-    transition: 'background-color 0.15s',
+    cursor: 'pointer',
+    transition: 'background-color var(--transition-fast)',
   },
   buttonSecondary: {
-    backgroundColor: 'var(--color-border)',
-    color: 'var(--color-fg)',
-    padding: 'var(--spacing-xs) var(--spacing-md)',
+    padding: 'var(--spacing-sm) var(--spacing-md)',
+    border: '1px solid var(--color-border)',
     borderRadius: 'var(--radius-sm)',
+    backgroundColor: 'var(--color-surface)',
+    color: 'var(--color-text)',
+    fontSize: 'var(--font-size-sm)',
     fontWeight: 500,
-    transition: 'background-color 0.15s',
+    cursor: 'pointer',
+    transition: 'background-color var(--transition-fast)',
   },
 }
+

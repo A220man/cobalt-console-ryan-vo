@@ -32,6 +32,9 @@ vi.mock('../api/client', () => ({
       create: vi.fn(),
       hide: vi.fn(),
       show: vi.fn(),
+      minimize: vi.fn(),
+      maximize: vi.fn(),
+      restore: vi.fn(),
     },
     health: {
       check: vi.fn(),
@@ -109,4 +112,73 @@ describe('Dashboard', () => {
       expect(api.windows.show).toHaveBeenCalledWith('win-2')
     })
   })
+
+  it('handles minimize action', async () => {
+    api.windows.minimize.mockResolvedValue({ ...mockWindows[0], state: 'minimized' })
+    render(<Dashboard />)
+
+    await waitFor(() => expect(screen.getByText('Window 1')).toBeInTheDocument())
+
+    const minimizeButton = screen.getByText('Minimize')
+    fireEvent.click(minimizeButton)
+
+    await waitFor(() => {
+      expect(api.windows.minimize).toHaveBeenCalledWith('win-1')
+    })
+  })
+
+  it('handles maximize action', async () => {
+    api.windows.maximize.mockResolvedValue({ ...mockWindows[0], state: 'maximized' })
+    render(<Dashboard />)
+
+    await waitFor(() => expect(screen.getByText('Window 1')).toBeInTheDocument())
+
+    const maximizeButton = screen.getByText('Maximize')
+    fireEvent.click(maximizeButton)
+
+    await waitFor(() => {
+      expect(api.windows.maximize).toHaveBeenCalledWith('win-1')
+    })
+  })
+
+  it('handles restore action from minimized', async () => {
+    const minimizedWindows: WindowState[] = [{
+      ...mockWindows[0],
+      state: 'minimized',
+    }]
+    api.windows.list.mockResolvedValue({ windows: minimizedWindows, total: 1, page: 1, page_size: 20 })
+    api.windows.restore.mockResolvedValue({ ...minimizedWindows[0], state: 'visible' })
+
+    render(<Dashboard />)
+
+    await waitFor(() => expect(screen.getByText('Window 1')).toBeInTheDocument())
+
+    const restoreButton = screen.getByText('Restore')
+    fireEvent.click(restoreButton)
+
+    await waitFor(() => {
+      expect(api.windows.restore).toHaveBeenCalledWith('win-1')
+    })
+  })
+
+  it('handles restore action from maximized', async () => {
+    const maximizedWindows: WindowState[] = [{
+      ...mockWindows[0],
+      state: 'maximized',
+    }]
+    api.windows.list.mockResolvedValue({ windows: maximizedWindows, total: 1, page: 1, page_size: 20 })
+    api.windows.restore.mockResolvedValue({ ...maximizedWindows[0], state: 'visible' })
+
+    render(<Dashboard />)
+
+    await waitFor(() => expect(screen.getByText('Window 1')).toBeInTheDocument())
+
+    const restoreButton = screen.getByText('Restore')
+    fireEvent.click(restoreButton)
+
+    await waitFor(() => {
+      expect(api.windows.restore).toHaveBeenCalledWith('win-1')
+    })
+  })
 })
+

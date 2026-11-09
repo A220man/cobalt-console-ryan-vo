@@ -48,8 +48,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Unknown error' }))
-    throw new Error(error.detail || `HTTP ${response.status}`)
+    const error = await response.json().catch(() => ({ detail: 'Request failed' }))
+    throw new Error(error.detail || 'Request failed')
   }
 
   if (response.status === 204) {
@@ -116,6 +116,13 @@ export const api = {
       (windowId: string) => Promise<WindowState>
     >,
 
+    restore: ((windowId: string) =>
+      request<WindowState>(`/windows/${encodeURIComponent(windowId)}/restore`, {
+        method: 'POST',
+      })) as MockableFn<
+      (windowId: string) => Promise<WindowState>
+    >,
+
     delete: ((windowId: string) =>
       request<void>(`/windows/${encodeURIComponent(windowId)}`, {
         method: 'DELETE',
@@ -130,3 +137,4 @@ export const api = {
     >,
   },
 }
+

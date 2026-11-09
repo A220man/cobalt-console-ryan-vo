@@ -69,6 +69,19 @@ class WindowService:
     async def show_window(self, window_id: str) -> Optional[WindowResponse]:
         return await self.update_window(window_id, WindowUpdate(state=WindowState.VISIBLE))
 
+    async def restore_window(self, window_id: str) -> Optional[WindowResponse]:
+        """Restore window from minimized or maximized state to visible."""
+        result = await self.session.execute(select(Window).where(Window.window_id == window_id))
+        window = result.scalar_one_or_none()
+        if not window:
+            return None
+
+        # Only restore from minimized or maximized states
+        if window.state not in (WindowState.MINIMIZED, WindowState.MAXIMIZED):
+            return None
+
+        return await self.update_window(window_id, WindowUpdate(state=WindowState.VISIBLE))
+
     async def delete_window(self, window_id: str) -> bool:
         result = await self.session.execute(select(Window).where(Window.window_id == window_id))
         window = result.scalar_one_or_none()
@@ -78,3 +91,4 @@ class WindowService:
         await self.session.delete(window)
         await self.session.commit()
         return True
+
