@@ -222,3 +222,28 @@ class TestWindowService:
         shown = await window_service.show_window("svc-3")
         assert shown is not None
         assert shown.state == WindowState.VISIBLE
+    @pytest.mark.asyncio
+    async def test_restore_service(self, window_service: WindowService):
+        # Create and minimize, then restore
+        await window_service.create_window(WindowCreate(window_id="svc-rest-1", title="Restore SVC"))
+        minimized = await window_service.minimize_window("svc-rest-1")
+        assert minimized is not None
+        assert minimized.state == WindowState.MINIMIZED
+        restored = await window_service.restore_window("svc-rest-1")
+        assert restored is not None
+        assert restored.state == WindowState.VISIBLE
+
+        # Create and maximize, then restore
+        await window_service.create_window(WindowCreate(window_id="svc-rest-2", title="Restore Max SVC"))
+        maximized = await window_service.maximize_window("svc-rest-2")
+        assert maximized is not None
+        assert maximized.state == WindowState.MAXIMIZED
+        restored = await window_service.restore_window("svc-rest-2")
+        assert restored is not None
+        assert restored.state == WindowState.VISIBLE
+
+        # Create and hide, then restore (should return None)
+        await window_service.create_window(WindowCreate(window_id="svc-rest-3", title="Hidden Restore SVC"))
+        await window_service.hide_window("svc-rest-3")
+        restored = await window_service.restore_window("svc-rest-3")
+        assert restored is None
