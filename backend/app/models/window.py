@@ -69,3 +69,33 @@ class WindowListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+# Keyboard state tracking for mobile touch support
+class KeyboardState(str, Enum):
+    """Soft keyboard visibility states for mobile text input handling."""
+    UNKNOWN = "unknown"
+    SHOWING = "showing"
+    VISIBLE = "visible"
+    HIDING = "hiding"
+
+
+class TextInputInfo(Base):
+    """Optional text input focus tracking for mobile keyboard triggers."""
+    __tablename__ = "text_inputs"
+
+    id = Column(Integer, primary_key=True)
+    window_id = Column(String, ForeignKey("windows.window_id"), nullable=False)
+    input_id = Column(String, nullable=False, index=True)
+    is_focused = Column(Boolean, default=False)
+    keyboard_state = Column(Enum(KeyboardState), default=KeyboardState.UNKNOWN)
+    last_updated = Column(DateTime(timezone=True), server_default=func.now())
+
+    window = relationship("Window", back_populates="text_inputs")
+
+    def model_dump(self) -> dict:
+        return {
+            "id": self.id,
+            "window_id": self.window_id,
+            "input_id": self.input_id,
+            "is_focused": self.is_focused,
+            "keyboard_state": self.keyboard_state,
+        }

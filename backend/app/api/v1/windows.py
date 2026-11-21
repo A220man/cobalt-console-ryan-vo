@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, and_
 
 from app.core.database import get_session
-from app.models.window import WindowCreate, WindowListResponse, WindowResponse, WindowUpdate
+from app.models.window import WindowCreate, WindowListResponse, WindowResponse, WindowUpdate, KeyboardState, TextInputInfo
 from app.services.window_service import WindowService
 
 router = APIRouter()
@@ -119,3 +120,80 @@ async def delete_window(
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Window not found")
 
+
+# Keyboard status endpoint for mobile touch support
+class KeyboardStatusRequest(BaseModel):
+    input_id: str = Field(..., min_length=1)
+    is_focused: bool = False
+    keyboard_state: KeyboardState = KeyboardState.UNKNOWN
+
+
+class KeyboardStatusResponse(BaseModel):
+    input_id: str
+    is_focused: bool
+    keyboard_state: KeyboardState
+
+
+@router.post("/windows/{window_id}/keyboard/status", response_model=KeyboardStatusResponse)
+async def set_keyboard_status(
+    window_id: str,
+    keyboard_data: KeyboardStatusRequest,
+    service: WindowService = Depends(get_window_service),
+) -> KeyboardStatusResponse:
+    """Set keyboard visibility state for mobile text input handling."""
+    result = await service.session.execute(
+        select(TextInputInfo).where(
+            and_(TextInputInfo.window_id == window_id, TextInputInfo.input_id == keyboard_data.input_id)
+        )
+    )
+    text_input = result.scalar_one_or_none()
+
+    if text_input:
+        text_input.is_focused = keyboard_data.is_focused
+        text_input.keyboard_state = keyboard_data.keyboard_state
+        text_input.last_updated = func.now()
+    else:
+        text_input = TextInputInfo(
+            window_id=window_id,
+            input_id=keyboard_data.input_id,
+            is_focused=keyboard_data.is_focused,
+            keyboard_state=keyboard_data.keyboard_state,
+        )
+        service.session.add(text_input)
+
+    await service.session.commit()
+    await service.session.refresh(text_input)
+
+    return KeyboardStatusResponse(
+        input_id=text_input.input_id,
+        is_focused=text_input.is_focused,
+        keyboard_state=text_input.keyboard_state,
+    )
+
+
+@router.get("/windows/{window_id}/keyboard/status", response_model=KeyboardStatusResponse)
+async def get_keyboard_status(
+    window_id: str,
+    input_id: str = Query(..., min_length=1),
+    service: WindowService = Depends(get_window_service),
+) -> KeyboardStatusResponse:
+    """Get keyboard visibility state for mobile text input handling."""
+    result = await service.session.execute(
+        select(TextInputInfo).where(
+            and_(TextInputInfo.window_id == window_id, TextInputInfo.input_id == input_id)
+        )
+    )
+    text_input = result.scalar_one_or_none()
+
+    if not text_input:
+        return KeyboardStatusResponse(
+            input_id=input_id,
+            is_focused=False,
+            keyboard_state=KeyboardState.UNKNOWN,
+        )
+
+    return KeyboardStatusResponse(
+        input_id=text_input.input_id,
+        is_focused=text_input.is_focused,
+        keyboard_state=text_input.keyboard_state,
+    )
