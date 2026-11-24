@@ -62,8 +62,19 @@
         "Protected routes and API endpoints",
         "Role-based access (admin/operator/analyst)"
       ],
-      "implementation": ["backend/app/core/auth.py", "backend/app/api/v1/auth.py", "backend/app/api/v1/windows.py", "backend/app/main.py", "backend/app/tests/test_auth.py", "backend/app/tests/test_windows.py"],
-      "tests": ["backend/app/tests/test_health.py", "backend/app/tests/test_windows.py", "frontend/src/pages/Dashboard.test.tsx"]
+      "implementation": [
+        "backend/app/core/auth.py",
+        "backend/app/api/v1/auth.py",
+        "backend/app/api/v1/windows.py",
+        "backend/app/main.py",
+        "backend/app/tests/test_auth.py",
+        "backend/app/tests/test_windows.py"
+      ],
+      "tests": [
+        "backend/app/tests/test_health.py",
+        "backend/app/tests/test_windows.py",
+        "frontend/src/pages/Dashboard.test.tsx"
+      ]
     },
     {
       "id": "window-management",
@@ -91,15 +102,21 @@
     {
       "id": "touch-support",
       "title": "Touch Input Support for Mobile (Issue #3310)",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "Soft keyboard triggers for text inputs",
         "Long-press context menus",
         "Touch drag handlers for sliders/dividers",
         "Responsive breakpoints for phone width"
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/app/api/v1/windows.py",
+        "backend/app/models/window.py",
+        "backend/app/services/window_service.py"
+      ],
+      "tests": [
+        "backend/app/tests/test_windows.py"
+      ]
     },
     {
       "id": "animation-system",

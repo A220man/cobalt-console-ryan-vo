@@ -60,13 +60,17 @@ Tests: `backend/app/tests/test_windows.py`, `frontend/src/pages/Dashboard.test.t
 
 ### touch-support — Touch Input Support for Mobile (Issue #3310)
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - Soft keyboard triggers for text inputs
 - Long-press context menus
 - Touch drag handlers for sliders/dividers
 - Responsive breakpoints for phone width
+
+Implementation: `backend/app/api/v1/windows.py`, `backend/app/models/window.py`, `backend/app/services/window_service.py`
+
+Tests: `backend/app/tests/test_windows.py`
 
 ### animation-system — Animation System (Issue #2967)
 
