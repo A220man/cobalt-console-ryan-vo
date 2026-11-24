@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, select
 
 from app.core.database import get_session
 from app.models.window import WindowCreate, WindowListResponse, WindowResponse, WindowUpdate, KeyboardState, TextInputInfo

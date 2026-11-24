@@ -3,18 +3,17 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, DateTime, Enum as SQLEnum, Integer, String
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, Integer, String, ForeignKey, Boolean, func
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
-
 
 class WindowState(str, Enum):
     VISIBLE = "visible"
     HIDDEN = "hidden"
     MINIMIZED = "minimized"
     MAXIMIZED = "maximized"
-
 
 class Window(Base):
     __tablename__ = "windows"
@@ -30,6 +29,9 @@ class Window(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
+    # Text input info relationship for mobile touch support
+    text_inputs = relationship("TextInputInfo", back_populates="window", cascade="all, delete-orphan")
+
 class WindowCreate(BaseModel):
     window_id: str = Field(..., min_length=1, max_length=100)
     title: str = Field(..., min_length=1, max_length=255)
@@ -38,7 +40,6 @@ class WindowCreate(BaseModel):
     width: int = Field(default=800, ge=100, le=10000)
     height: int = Field(default=600, ge=100, le=10000)
 
-
 class WindowUpdate(BaseModel):
     title: Optional[str] = Field(default=None, min_length=1, max_length=255)
     state: Optional[WindowState] = None
@@ -46,7 +47,6 @@ class WindowUpdate(BaseModel):
     y: Optional[int] = Field(default=None, ge=-10000)
     width: Optional[int] = Field(default=None, ge=100, le=10000)
     height: Optional[int] = Field(default=None, ge=100, le=10000)
-
 
 class WindowResponse(BaseModel):
     id: int
@@ -63,12 +63,12 @@ class WindowResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
 class WindowListResponse(BaseModel):
     windows: list[WindowResponse]
     total: int
     page: int
     page_size: int
+
 # Keyboard state tracking for mobile touch support
 class KeyboardState(str, Enum):
     """Soft keyboard visibility states for mobile text input handling."""
@@ -76,7 +76,6 @@ class KeyboardState(str, Enum):
     SHOWING = "showing"
     VISIBLE = "visible"
     HIDING = "hiding"
-
 
 class TextInputInfo(Base):
     """Optional text input focus tracking for mobile keyboard triggers."""
@@ -86,7 +85,7 @@ class TextInputInfo(Base):
     window_id = Column(String, ForeignKey("windows.window_id"), nullable=False)
     input_id = Column(String, nullable=False, index=True)
     is_focused = Column(Boolean, default=False)
-    keyboard_state = Column(Enum(KeyboardState), default=KeyboardState.UNKNOWN)
+    keyboard_state = Column(SQLEnum(KeyboardState), default=KeyboardState.UNKNOWN)
     last_updated = Column(DateTime(timezone=True), server_default=func.now())
 
     window = relationship("Window", back_populates="text_inputs")

@@ -247,3 +247,75 @@ class TestWindowService:
         await window_service.hide_window("svc-rest-3")
         restored = await window_service.restore_window("svc-rest-3")
         assert restored is None
+
+
+@pytest.mark.asyncio
+async def test_set_keyboard_status(client: AsyncClient):
+    """Test setting keyboard visibility state for mobile text input handling."""
+    await client.post("/api/v1/windows", json={"window_id": "kb-1", "title": "Keyboard Test"})
+    
+    # Set keyboard status - showing
+    response = await client.post(
+        "/api/v1/windows/kb-1/keyboard/status",
+        json={"input_id": "text-input-1", "is_focused": True, "keyboard_state": "showing"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["input_id"] == "text-input-1"
+    assert data["is_focused"] == True
+    assert data["keyboard_state"] == "showing"
+
+
+@pytest.mark.asyncio
+async def test_get_keyboard_status(client: AsyncClient):
+    """Test getting keyboard visibility state for mobile text input handling."""
+    await client.post("/api/v1/windows", json={"window_id": "kb-2", "title": "Keyboard Test"})
+    
+    # Get keyboard status when no text input exists
+    response = await client.get(
+        "/api/v1/windows/kb-2/keyboard/status",
+        params={"input_id": "nonexistent-input"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["input_id"] == "nonexistent-input"
+    assert data["is_focused"] == False
+    assert data["keyboard_state"] == "unknown"
+
+
+@pytest.mark.asyncio
+async def test_keyboard_status_full_lifecycle(client: AsyncClient):
+    """Test full keyboard status lifecycle: set, get, update."""
+    await client.post("/api/v1/windows", json={"window_id": "kb-3", "title": "Keyboard Lifecycle"})
+    
+    # Set initial state
+    await client.post(
+        "/api/v1/windows/kb-3/keyboard/status",
+        json={"input_id": "input-a", "is_focused": True, "keyboard_state": "visible"}
+    )
+    
+    # Verify the set state
+    response = await client.get(
+        "/api/v1/windows/kb-3/keyboard/status",
+        params={"input_id": "input-a"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["is_focused"] == True
+    assert data["keyboard_state"] == "visible"
+    
+    # Update the state
+    await client.post(
+        "/api/v1/windows/kb-3/keyboard/status",
+        json={"input_id": "input-a", "is_focused": False, "keyboard_state": "hiding"}
+    )
+    
+    # Verify the updated state
+    response = await client.get(
+        "/api/v1/windows/kb-3/keyboard/status",
+        params={"input_id": "input-a"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["is_focused"] == False
+    assert data["keyboard_state"] == "hiding"
