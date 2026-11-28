@@ -2,7 +2,7 @@ from typing import Optional
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.window import Window, WindowState, WindowCreate, WindowUpdate, WindowResponse, WindowListResponse
+from app.models.window import Window, WindowState, WindowCreate, WindowUpdate, WindowResponse, WindowListResponse, KeyboardState, TextInputInfo
 
 
 class WindowService:
@@ -81,6 +81,68 @@ class WindowService:
             return None
 
         return await self.update_window(window_id, WindowUpdate(state=WindowState.VISIBLE))
+
+    async def set_keyboard_status(self, window_id: str, input_id: str, is_focused: bool, keyboard_state: KeyboardState) -> TextInputInfo:
+        """Set keyboard visibility state for a mobile text input."""
+        result = await self.session.execute(
+            select(TextInputInfo).where(
+                and_(TextInputInfo.window_id == window_id, TextInputInfo.input_id == input_id)
+            )
+        )
+        text_input = result.scalar_one_or_none()
+
+        if text_input:
+            text_input.is_focused = is_focused
+            text_input.keyboard_state = keyboard_state
+            text_input.last_updated = func.now()
+        else:
+            text_input = TextInputInfo(
+                window_id=window_id,
+                input_id=input_id,
+                is_focused=is_focused,
+                keyboard_state=keyboard_state,
+            )
+            self.session.add(text_input)
+
+        await self.session.commit()
+        await self.session.refresh(text_input)
+        return text_input
+
+    async def get_keyboard_status(self, window_id: str, input_id: str) -> Optional[TextInputInfo]:
+        """Get keyboard visibility state for a mobile text input."""
+        result = await self.session.execute(
+            select(TextInputInfo).where(
+                and_(TextInputInfo.window_id == window_id, TextInputInfo.input_id == input_id)
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def keyboard_status_lifecycle(self, window_id: str, input_id: str, is_focused: bool, keyboard_state: KeyboardState) -> TextInputInfo:
+        """Full keyboard status lifecycle: set, get, update."""
+        # Set initial state
+        text_input = await self.set_keyboard_status(window_id, input_id, is_focused, keyboard_state)
+        
+        # Verify the set state
+        fetched = await self.get_keyboard_status(window_id, input_id)
+        assert fetched is not None
+        assert fetched.is_focused == is_focused
+        assert fetched.keyboard_state == keyboard_state
+        
+        # Determine the opposite state
+        opposite_focused = not is_focused
+        opposite_state = KeyboardState.HIDING if keyboard_state == KeyboardState.VISIBLE else KeyboardState.VISIBLE
+        
+        # Update the state
+        text_input = await self.set_keyboard_status(window_id, input_id, opposite_focused, opposite_state)
+        
+        # Verify the updated state
+        fetched = await self.get_keyboard_status(window_id, input_id)
+        assert fetched is not None
+        assert fetched.is_focused == opposite_focused
+        assert fetched.keyboard_state == opposite_state
+        
+        return text_input
+
 
     async def delete_window(self, window_id: str) -> bool:
         result = await self.session.execute(select(Window).where(Window.window_id == window_id))
