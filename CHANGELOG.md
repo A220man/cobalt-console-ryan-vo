@@ -1,6 +1,18 @@
 # Changelog
 
-## 1.7.0 — work-in-progress checkpoint
+## 1.8.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
+## 1.7.1 — touch support for mobile text inputs
+
+### Added
+- Keyboard state tracking for mobile text input handling
+  - `POST /windows/{window_id}/keyboard/status` endpoint for setting keyboard visibility
+  - `GET /windows/{window_id}/keyboard/status` endpoint for getting keyboard status
+  - `TextInputInfo` model for persistent keyboard state in SQLite
+  - `WindowService.set_keyboard_status()`, `get_keyboard_status()`, `keyboard_status_lifecycle()` methods
+  - Three new tests: `test_set_keyboard_status`, `test_get_keyboard_status`, `test_keyboard_status_full_lifecycle`
 
 Partial code published for continued development. Known issues: STATUS.md.
 
